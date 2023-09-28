@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:5435}/${DB_NAME:auth_db}?currentSchema=public&stringtype=unspecified
+    username: ${DB_USERNAME:auth_user}
+    password: ${DB_PASSWORD:q}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    out-of-order: true
+    validate-migration-naming: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_REALM_CERT_URL:http://localhost:18081/realms/prod_realm}
+          jwk-set-uri: ${KEYCLOAK_REALM_CERT_URL:http://localhost:18081/realms/prod_realm/protocol/openid-connect/certs}
+server:
+  port: 8080
+#  servlet:
+#    context-path: /api
+
+keycloak:
+  realm: prod_realm
+  auth-server-url: http://localhost:18081/
+  resource: test_client
+  credentials:
+    secret: maskSecretInTestRealmJsonAndKeycloakWillGenerateNew
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - metrics
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+#    org.apache.http: DEBUG
