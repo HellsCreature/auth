@@ -31,6 +31,8 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.keycloak:keycloak-admin-client:22.0.0'
 
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
 	compileOnly 'org.projectlombok:lombok'
 
 	runtimeOnly 'org.postgresql:postgresql'

@@ -3,6 +3,7 @@ package com.ars.auth.service;
 import com.ars.auth.domain.entity.State;
 import com.ars.auth.domain.repository.CompanyRepository;
 import com.ars.auth.domain.entity.Company;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +16,10 @@ public class CompanyService {
 
   CompanyRepository companyRepository;
 
+  public Company findById(Integer id) {
+    return companyRepository.findById(id).orElseThrow(NotFoundException::new);
+  }
+
   public Company create (String bin, String name) {
     Company company = Company.builder()
         .bin(bin)
@@ -22,6 +27,10 @@ public class CompanyService {
         .state(State.ACTIVE)
         .build();
 
+    return companyRepository.save(company);
+  }
+
+  public Company save(Company company) {
     return companyRepository.save(company);
   }
 

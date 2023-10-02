@@ -22,7 +22,7 @@ public class SpringSecurityAuditorAware implements AuditorAware<String> {
     Object obj = authentication.getPrincipal();
 
     if (obj instanceof Jwt jwt) {
-      return Optional.of((String) jwt.getClaims().get("preferred_username"));
+      return Optional.of(jwt.getClaimAsString("preferred_username"));
     }
 
     return Optional.empty();
