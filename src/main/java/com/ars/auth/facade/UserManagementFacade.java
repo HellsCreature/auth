@@ -7,13 +7,12 @@ import com.ars.auth.service.KeycloakService;
 import com.ars.auth.domain.entity.UserAccount;
 import com.ars.auth.model.CreateUserRequest;
 import com.ars.auth.service.UserAccountService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.ws.rs.core.Response;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.keycloak.representations.AccessTokenResponse;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +23,7 @@ public class UserManagementFacade {
 
   UserAccountService userAccountService;
   KeycloakService keycloakService;
-
-  ObjectMapper objectMapper;
+  ModelMapper modelMapper;
 
   public AccessTokenResponse login(LoginRequest loginRequest) {
     return keycloakService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
@@ -33,16 +31,19 @@ public class UserManagementFacade {
 
   public UserDto getUser(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
-    return objectMapper.convertValue(userAccount, UserDto.class);
+    return modelMapper.map(userAccount, UserDto.class);
   }
 
   @Transactional
   public void createUser(CreateUserRequest request) {
+
+    //todo проверить, есть ли уже такой юзер
+
    String keycloakUserId = keycloakService.createUser(request.getUsername(), request.getPassword(),
-        request.getEmail(), request.getFirstname(), request.getLastname(), request.getRoles());
+        request.getEmail(), request.getFirstname(), request.getLastname(), request.getRoles(), request.getCompanyId());
 
     userAccountService.create(request.getCompanyId(), keycloakUserId, request.getUsername(),
-        request.getEmail());
+        request.getEmail(), request.getType());
   }
 
   @Transactional
@@ -76,4 +77,16 @@ public class UserManagementFacade {
     keycloakService.removeRoles(userAccount.getExternalId(), roles);
   }
 
+  public List<UserDto> getAll() {
+    return userAccountService.findAll().stream()
+        .map(userAccount -> modelMapper.map(userAccount, UserDto.class))
+        .toList();
+  }
+
+  @Transactional
+  public void updateUser(UserDto userDto) {
+    UserAccount userAccount = userAccountService.findById(userDto.getId());
+    modelMapper.map(userDto, userAccount);
+    userAccountService.save(userAccount);
+  }
 }

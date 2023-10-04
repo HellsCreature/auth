@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.keycloak:keycloak-admin-client:22.0.0'
+	implementation 'org.modelmapper:modelmapper:3.1.1'
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 

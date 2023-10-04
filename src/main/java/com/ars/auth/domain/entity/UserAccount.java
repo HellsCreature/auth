@@ -27,4 +27,7 @@ public class UserAccount extends AbstractEntity {
 
   @Enumerated(EnumType.STRING)
   State state;
+
+  @Enumerated(EnumType.STRING)
+  UserAccountType type;
 }

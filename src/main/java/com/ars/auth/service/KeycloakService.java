@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -57,10 +58,11 @@ public class KeycloakService {
   }
 
   public String createUser(String username, String password, String email, String firstname,
-      String lastname, List<String> roles) {
+      String lastname, List<String> roles, Integer companyId) {
 
     UsersResource usersResource = getClientCredentialsInstance().realm(realm).users();
     CredentialRepresentation credentialRepresentation = createPasswordCredentials(password);
+    Map<String, List<String>> attributes = Map.of("companyId", List.of(companyId.toString()));
 
     UserRepresentation kcUser = new UserRepresentation();
     kcUser.setUsername(username);
@@ -70,21 +72,23 @@ public class KeycloakService {
     kcUser.setEmail(email);
     kcUser.setEnabled(true);
     kcUser.setEmailVerified(false);
+    kcUser.setAttributes(attributes);
 
-    Response response = usersResource.create(kcUser);
+    try (Response response = usersResource.create(kcUser)) {
 
-    String path = null;
-    try {
-      path = new URL(response.getHeaderString("Location")).getPath();
-    } catch (MalformedURLException e) {
-      throw new RuntimeException(e);
+      String path = null;
+      try {
+        path = new URL(response.getHeaderString("Location")).getPath();
+      } catch (MalformedURLException e) {
+        throw new RuntimeException(e);
+      }
+
+      String userId = path.substring(path.lastIndexOf("/") + 1);
+
+      addRoles(userId, roles);
+
+      return userId;
     }
-
-    String userId = path.substring(path.lastIndexOf("/") + 1);
-
-    addRoles(userId, roles);
-
-    return userId;
   }
 
   private CredentialRepresentation createPasswordCredentials(String password) {
@@ -96,8 +100,6 @@ public class KeycloakService {
   }
 
   public AccessTokenResponse getToken(String username, String password) {
-    //todo убрать лишнее из токена вернуть кастомный токен
-//    return getUserPasswordCredentialsInstance(username, password).tokenManager().getAccessTokenString();
     return getUserPasswordCredentialsInstance(username, password).tokenManager().getAccessToken();
   }
 

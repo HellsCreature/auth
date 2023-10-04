@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CompanyDto {
 
+  Integer id;
+
   String bin;
 
   String name;

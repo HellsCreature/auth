@@ -1,4 +1,5 @@
 create type state as enum ('ACTIVE', 'INACTIVE', 'SUSPENDED');
+create type user_account_type as enum ('USER', 'CLIENT');
 
 create table user_account
 (
@@ -8,6 +9,7 @@ create table user_account
     username         varchar(100)             not null,
     email            varchar(100)             not null,
     state            state                    not null,
+    type             user_account_type        not null,
     updated_by       varchar(100)             not null,
     updated_datetime timestamp with time zone not null,
     created_by       varchar(100)             not null,

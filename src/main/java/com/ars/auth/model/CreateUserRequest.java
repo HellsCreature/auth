@@ -1,5 +1,6 @@
 package com.ars.auth.model;
 
+import com.ars.auth.domain.entity.UserAccountType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,8 @@ public class CreateUserRequest {
   String firstname;
 
   String lastname;
+
+  UserAccountType type;
 
   @NotNull
   List<String> roles;

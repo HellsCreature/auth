@@ -1,14 +1,15 @@
 package com.ars.auth.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,7 +34,8 @@ public class GeneralConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers("/user/login").permitAll()
+            .requestMatchers("/login").permitAll()
+            .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .anyRequest().authenticated())
         .oauth2ResourceServer((oauth2ResourceServer) -> oauth2ResourceServer.jwt(
             jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(
@@ -56,6 +58,11 @@ public class GeneralConfiguration {
     jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
     return jwtAuthenticationConverter;
+  }
+
+  @Bean
+  public ModelMapper modelMapper() {
+    return new ModelMapper();
   }
 
 }
