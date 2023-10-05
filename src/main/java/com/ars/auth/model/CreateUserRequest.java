@@ -30,8 +30,6 @@ public class CreateUserRequest {
 
   String lastname;
 
-  UserAccountType type;
-
   @NotNull
   List<String> roles;
 }

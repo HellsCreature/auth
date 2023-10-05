@@ -148,5 +148,25 @@ public class KeycloakService {
         .remove(roleRepresentations);
   }
 
+  public List<String> getRoles(String userId) {
+    return getClientCredentialsInstance()
+        .realm(realm)
+        .users()
+        .get(userId)
+        .roles()
+        .realmLevel()
+        .listAll()
+        .stream()
+        .map(RoleRepresentation::getName)
+        .toList();
+  }
+
+  public void resetPassword(String userId, String password) {
+    getClientCredentialsInstance()
+        .realm(realm)
+        .users()
+        .get(userId)
+        .resetPassword(createPasswordCredentials(password));
+  }
 }
 

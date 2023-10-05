@@ -4,7 +4,6 @@ import com.ars.auth.domain.entity.State;
 import com.ars.auth.domain.entity.UserAccount;
 import com.ars.auth.domain.entity.UserAccountType;
 import com.ars.auth.domain.repository.UserAccountRepository;
-import com.ars.auth.model.UserDto;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class UserAccountService {
         .type(type)
         .build();
 
-    return userAccountRepository.save(userAccount);
+    return save(userAccount);
   }
 
   public UserAccount findById(Integer id) {
@@ -39,7 +38,11 @@ public class UserAccountService {
     return userAccountRepository.save(userAccount);
   }
 
-  public List<UserAccount> findAll() {
-    return userAccountRepository.findAll();
+  public List<UserAccount> findAllUsers() {
+    return userAccountRepository.findAllByType(UserAccountType.USER);
+  }
+
+  public List<UserAccount> findAllClients() {
+    return userAccountRepository.findAllByType(UserAccountType.CLIENT);
   }
 }

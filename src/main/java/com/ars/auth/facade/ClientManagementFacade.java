@@ -1,18 +1,17 @@
 package com.ars.auth.facade;
 
 import com.ars.auth.domain.entity.State;
-import com.ars.auth.domain.entity.UserAccountType;
-import com.ars.auth.model.LoginRequest;
-import com.ars.auth.model.UserDto;
-import com.ars.auth.service.KeycloakService;
 import com.ars.auth.domain.entity.UserAccount;
-import com.ars.auth.model.CreateUserRequest;
+import com.ars.auth.domain.entity.UserAccountType;
+import com.ars.auth.model.ClientDto;
+import com.ars.auth.model.CreateClientRequest;
+import com.ars.auth.service.KeycloakService;
 import com.ars.auth.service.UserAccountService;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.keycloak.representations.AccessTokenResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,31 +19,37 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserManagementFacade {
-
+public class ClientManagementFacade {
   UserAccountService userAccountService;
   KeycloakService keycloakService;
   ModelMapper modelMapper;
 
-  public AccessTokenResponse login(LoginRequest loginRequest) {
-    return keycloakService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
-  }
+  static Integer LENGTH = 20;
 
-  public UserDto getUser(Integer id) {
+  public ClientDto getClient(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
-    return modelMapper.map(userAccount, UserDto.class);
+    return modelMapper.map(userAccount, ClientDto.class);
   }
 
   @Transactional
-  public void createUser(CreateUserRequest request) {
+  public ClientDto createClient(CreateClientRequest request) {
 
     //todo проверить, есть ли уже такой юзер
 
-   String keycloakUserId = keycloakService.createUser(request.getUsername(), request.getPassword(),
-        request.getEmail(), request.getFirstname(), request.getLastname(), request.getRoles(), request.getCompanyId());
+    String clientId = RandomStringUtils.randomAlphanumeric(LENGTH);
+    String clientSecret = RandomStringUtils.randomAlphanumeric(LENGTH);
+    String email = "thisIsFakeEmailForClient_" + clientId + "@qasdx.sdq";
 
-    userAccountService.create(request.getCompanyId(), keycloakUserId, request.getUsername(),
-        request.getEmail(), UserAccountType.USER);
+    String keycloakUserId = keycloakService.createUser(clientId, clientSecret,
+        email, null, null, List.of("client"), request.getCompanyId());
+
+    UserAccount userAccount = userAccountService.create(request.getCompanyId(), keycloakUserId, clientId,
+        email, UserAccountType.CLIENT);
+
+    ClientDto clientDto = modelMapper.map(userAccount, ClientDto.class);
+    clientDto.setClientSecret(clientSecret);
+
+    return clientDto;
   }
 
   @Transactional
@@ -78,21 +83,32 @@ public class UserManagementFacade {
     keycloakService.removeRoles(userAccount.getExternalId(), roles);
   }
 
-  public List<UserDto> getAll() {
-    return userAccountService.findAllUsers().stream()
-        .map(userAccount -> modelMapper.map(userAccount, UserDto.class))
+  public List<ClientDto> getAll() {
+    return userAccountService.findAllClients().stream()
+        .map(userAccount -> modelMapper.map(userAccount, ClientDto.class))
         .toList();
   }
 
   @Transactional
-  public void updateUser(UserDto userDto) {
-    UserAccount userAccount = userAccountService.findById(userDto.getId());
-    modelMapper.map(userDto, userAccount);
+  public void updateClient(ClientDto clientDto) {
+    UserAccount userAccount = userAccountService.findById(clientDto.getId());
+    modelMapper.map(clientDto, userAccount);
     userAccountService.save(userAccount);
   }
 
   public List<String> getRoles(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
     return keycloakService.getRoles(userAccount.getExternalId());
+  }
+
+  public ClientDto resetSecret(Integer id) {
+    UserAccount userAccount = userAccountService.findById(id);
+    String clientSecret = RandomStringUtils.randomAlphanumeric(LENGTH);
+    keycloakService.resetPassword(userAccount.getExternalId(), clientSecret);
+
+    ClientDto clientDto = modelMapper.map(userAccount, ClientDto.class);
+    clientDto.setClientSecret(clientSecret);
+
+    return clientDto;
   }
 }

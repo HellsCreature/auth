@@ -1,9 +1,12 @@
 package com.ars.auth.config;
 
+import com.ars.auth.domain.entity.UserAccount;
+import com.ars.auth.model.ClientDto;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -62,7 +65,14 @@ public class GeneralConfiguration {
 
   @Bean
   public ModelMapper modelMapper() {
-    return new ModelMapper();
+    ModelMapper modelMapper = new ModelMapper();
+
+    TypeMap<UserAccount, ClientDto> userAccountToClientDtoTypeMap = modelMapper.createTypeMap(
+        UserAccount.class, ClientDto.class);
+
+    userAccountToClientDtoTypeMap.addMapping(UserAccount::getUsername, ClientDto::setClientId);
+
+    return modelMapper;
   }
 
 }
