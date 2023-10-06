@@ -1,9 +1,8 @@
 package com.ars.auth.controller;
 
-import com.ars.auth.domain.entity.Company;
+import com.ars.auth.facade.CompanyManagementFacade;
 import com.ars.auth.model.CompanyDto;
 import com.ars.auth.model.CreateCompanyRequest;
-import com.ars.auth.facade.CompanyManagementFacade;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

@@ -2,17 +2,13 @@ package com.ars.auth.service;
 
 import com.ars.auth.domain.entity.Company;
 import com.ars.auth.domain.entity.State;
-import com.ars.auth.domain.entity.UserAccount;
 import com.ars.auth.domain.repository.CompanyRepository;
-import com.ars.auth.model.CompanyDto;
-import com.ars.auth.model.UserDto;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,12 +1,12 @@
 package com.ars.auth.facade;
 
 import com.ars.auth.domain.entity.State;
+import com.ars.auth.domain.entity.UserAccount;
 import com.ars.auth.domain.entity.UserAccountType;
+import com.ars.auth.model.CreateUserRequest;
 import com.ars.auth.model.LoginRequest;
 import com.ars.auth.model.UserDto;
 import com.ars.auth.service.KeycloakService;
-import com.ars.auth.domain.entity.UserAccount;
-import com.ars.auth.model.CreateUserRequest;
 import com.ars.auth.service.UserAccountService;
 import java.util.List;
 import lombok.AccessLevel;

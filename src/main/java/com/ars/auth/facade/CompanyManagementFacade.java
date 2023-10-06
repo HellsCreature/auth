@@ -5,7 +5,6 @@ import com.ars.auth.domain.entity.State;
 import com.ars.auth.model.CompanyDto;
 import com.ars.auth.model.CreateCompanyRequest;
 import com.ars.auth.service.CompanyService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

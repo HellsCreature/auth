@@ -39,6 +39,7 @@ public class GeneralConfiguration {
         .authorizeHttpRequests((authorize) -> authorize
             .requestMatchers("/login").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated())
         .oauth2ResourceServer((oauth2ResourceServer) -> oauth2ResourceServer.jwt(
             jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(

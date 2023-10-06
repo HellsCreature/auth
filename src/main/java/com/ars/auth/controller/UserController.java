@@ -3,7 +3,6 @@ package com.ars.auth.controller;
 import com.ars.auth.facade.UserManagementFacade;
 import com.ars.auth.model.CreateUserRequest;
 import com.ars.auth.model.UserDto;
-import com.ars.auth.util.JwtUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

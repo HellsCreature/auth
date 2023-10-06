@@ -3,7 +3,6 @@ package com.ars.auth.service;
 import jakarta.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
