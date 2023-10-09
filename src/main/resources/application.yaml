@@ -21,7 +21,7 @@ server:
 keycloak:
   realm: prod_realm
   auth-server-url: http://localhost:18081/
-  resource: test_client
+  resource: auth_client
   credentials:
     secret: maskSecretInTestRealmJsonAndKeycloakWillGenerateNew
 

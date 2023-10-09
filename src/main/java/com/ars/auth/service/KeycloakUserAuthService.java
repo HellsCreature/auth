@@ -18,9 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KeycloakService {
+public class KeycloakUserAuthService implements UserAuthService {
 
-  //TODO Подумать, где сделать интерфейс, чтобы юзать кейклоак или что-то другое
   @Value("${keycloak.auth-server-url}")
   public String serverURL;
   @Value("${keycloak.realm}")
@@ -43,8 +42,6 @@ public class KeycloakService {
 
   private Keycloak getUserPasswordCredentialsInstance(String username, String password) {
 
-    //todo: проверить, что юзер есть в базе сервиса
-
     return KeycloakBuilder.builder()
         .realm(realm)
         .serverUrl(serverURL)
@@ -56,6 +53,7 @@ public class KeycloakService {
         .build();
   }
 
+  @Override
   public String createUser(String username, String password, String email, String firstname,
       String lastname, List<String> roles, Integer companyId) {
 
@@ -98,10 +96,12 @@ public class KeycloakService {
     return passwordCredentials;
   }
 
+  @Override
   public AccessTokenResponse getToken(String username, String password) {
     return getUserPasswordCredentialsInstance(username, password).tokenManager().getAccessToken();
   }
 
+  @Override
   public void addRoles(String userId, List<String> roles) {
 
     List<RoleRepresentation> roleRepresentations = getClientCredentialsInstance()
@@ -115,8 +115,6 @@ public class KeycloakService {
         .filter(roleRepresentation -> roles.contains(roleRepresentation.getName()))
         .toList();
 
-    //todo: если передали несуществующую роль, то вернуть ошибку
-
     getClientCredentialsInstance()
         .realm(realm)
         .users()
@@ -126,6 +124,7 @@ public class KeycloakService {
         .add(roleRepresentations);
   }
 
+  @Override
   public void removeRoles(String userId, List<String> roles) {
     List<RoleRepresentation> roleRepresentations = getClientCredentialsInstance()
         .realm(realm)
@@ -147,6 +146,7 @@ public class KeycloakService {
         .remove(roleRepresentations);
   }
 
+  @Override
   public List<String> getRoles(String userId) {
     return getClientCredentialsInstance()
         .realm(realm)
@@ -160,6 +160,7 @@ public class KeycloakService {
         .toList();
   }
 
+  @Override
   public void resetPassword(String userId, String password) {
     getClientCredentialsInstance()
         .realm(realm)

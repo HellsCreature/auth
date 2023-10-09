@@ -49,6 +49,7 @@ public class GeneralConfiguration {
     return http.build();
   }
 
+  //Arseniy: Конвертер для получения ролей из токена
   public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak() {
     Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt -> {
       Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");

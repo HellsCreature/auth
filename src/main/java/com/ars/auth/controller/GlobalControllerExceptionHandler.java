@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+//Arseniy: Шаблон для обработки ошибок
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 

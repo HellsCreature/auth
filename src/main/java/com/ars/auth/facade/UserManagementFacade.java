@@ -6,8 +6,8 @@ import com.ars.auth.domain.entity.UserAccountType;
 import com.ars.auth.model.CreateUserRequest;
 import com.ars.auth.model.LoginRequest;
 import com.ars.auth.model.UserDto;
-import com.ars.auth.service.KeycloakService;
 import com.ars.auth.service.UserAccountService;
+import com.ars.auth.service.UserAuthService;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +17,18 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+//Arseniy: Фасад для управления пользователями
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserManagementFacade {
 
   UserAccountService userAccountService;
-  KeycloakService keycloakService;
+  UserAuthService userAuthService;
   ModelMapper modelMapper;
 
   public AccessTokenResponse login(LoginRequest loginRequest) {
-    return keycloakService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
+    return userAuthService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
   }
 
   public UserDto getUser(Integer id) {
@@ -40,7 +41,7 @@ public class UserManagementFacade {
 
     //todo проверить, есть ли уже такой юзер
 
-   String keycloakUserId = keycloakService.createUser(request.getUsername(), request.getPassword(),
+   String keycloakUserId = userAuthService.createUser(request.getUsername(), request.getPassword(),
         request.getEmail(), request.getFirstname(), request.getLastname(), request.getRoles(), request.getCompanyId());
 
     userAccountService.create(request.getCompanyId(), keycloakUserId, request.getUsername(),
@@ -70,12 +71,12 @@ public class UserManagementFacade {
 
   public void addRoles(Integer id, List<String> roles) {
     UserAccount userAccount = userAccountService.findById(id);
-    keycloakService.addRoles(userAccount.getExternalId(), roles);
+    userAuthService.addRoles(userAccount.getExternalId(), roles);
   }
 
   public void removeRoles(Integer id, List<String> roles) {
     UserAccount userAccount = userAccountService.findById(id);
-    keycloakService.removeRoles(userAccount.getExternalId(), roles);
+    userAuthService.removeRoles(userAccount.getExternalId(), roles);
   }
 
   public List<UserDto> getAll() {
@@ -93,6 +94,6 @@ public class UserManagementFacade {
 
   public List<String> getRoles(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
-    return keycloakService.getRoles(userAccount.getExternalId());
+    return userAuthService.getRoles(userAccount.getExternalId());
   }
 }

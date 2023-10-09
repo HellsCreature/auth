@@ -5,8 +5,8 @@ import com.ars.auth.domain.entity.UserAccount;
 import com.ars.auth.domain.entity.UserAccountType;
 import com.ars.auth.model.ClientDto;
 import com.ars.auth.model.CreateClientRequest;
-import com.ars.auth.service.KeycloakService;
 import com.ars.auth.service.UserAccountService;
+import com.ars.auth.service.UserAuthService;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+//Arseniy: Фасад для управления клиентами (в смысле сервисами внешних систем)
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ClientManagementFacade {
   UserAccountService userAccountService;
-  KeycloakService keycloakService;
+  UserAuthService userAuthService;
   ModelMapper modelMapper;
 
   static Integer LENGTH = 20;
@@ -34,13 +35,11 @@ public class ClientManagementFacade {
   @Transactional
   public ClientDto createClient(CreateClientRequest request) {
 
-    //todo проверить, есть ли уже такой юзер
-
     String clientId = RandomStringUtils.randomAlphanumeric(LENGTH);
     String clientSecret = RandomStringUtils.randomAlphanumeric(LENGTH);
     String email = "thisIsFakeEmailForClient_" + clientId + "@qasdx.sdq";
 
-    String keycloakUserId = keycloakService.createUser(clientId, clientSecret,
+    String keycloakUserId = userAuthService.createUser(clientId, clientSecret,
         email, null, null, List.of("client"), request.getCompanyId());
 
     UserAccount userAccount = userAccountService.create(request.getCompanyId(), keycloakUserId, clientId,
@@ -75,12 +74,12 @@ public class ClientManagementFacade {
 
   public void addRoles(Integer id, List<String> roles) {
     UserAccount userAccount = userAccountService.findById(id);
-    keycloakService.addRoles(userAccount.getExternalId(), roles);
+    userAuthService.addRoles(userAccount.getExternalId(), roles);
   }
 
   public void removeRoles(Integer id, List<String> roles) {
     UserAccount userAccount = userAccountService.findById(id);
-    keycloakService.removeRoles(userAccount.getExternalId(), roles);
+    userAuthService.removeRoles(userAccount.getExternalId(), roles);
   }
 
   public List<ClientDto> getAll() {
@@ -98,13 +97,13 @@ public class ClientManagementFacade {
 
   public List<String> getRoles(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
-    return keycloakService.getRoles(userAccount.getExternalId());
+    return userAuthService.getRoles(userAccount.getExternalId());
   }
 
   public ClientDto resetSecret(Integer id) {
     UserAccount userAccount = userAccountService.findById(id);
     String clientSecret = RandomStringUtils.randomAlphanumeric(LENGTH);
-    keycloakService.resetPassword(userAccount.getExternalId(), clientSecret);
+    userAuthService.resetPassword(userAccount.getExternalId(), clientSecret);
 
     ClientDto clientDto = modelMapper.map(userAccount, ClientDto.class);
     clientDto.setClientSecret(clientSecret);
